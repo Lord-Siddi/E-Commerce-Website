@@ -13,7 +13,7 @@ export const createCheckoutSession = async (req, res) => {
     let totalAmount = 0;
 
     const lineItems = products.map((product) => {
-      const amount = Math.round(product.price * 100); // stripe wants u to send in the format of cents
+      const amount = Math.round(product.price * 100); 
       totalAmount += amount * product.quantity;
 
       return {
@@ -96,7 +96,6 @@ export const checkoutSuccess = async (req, res) => {
 
     const products = JSON.parse(session.metadata.products);
 
-    // ✅ ATOMIC operation (prevents race condition)
     const order = await Order.findOneAndUpdate(
       { stripeSessionId: sessionId }, // query
       {
@@ -113,11 +112,10 @@ export const checkoutSuccess = async (req, res) => {
       },
       {
         new: true,
-        upsert: true, // ⭐ CRITICAL
+        upsert: true, 
       }
     );
 
-    // ✅ Deactivate coupon only once
     if (session.metadata.couponCode) {
       await Coupon.findOneAndUpdate(
         {
@@ -160,7 +158,7 @@ async function createNewCoupon(userId) {
   const newCoupon = new Coupon({
     code: "GIFT" + Math.random().toString(36).substring(2, 8).toUpperCase(),
     discountPercentage: 10,
-    expirationDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+    expirationDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), 
     userId: userId,
   });
 
